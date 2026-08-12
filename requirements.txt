@@ -1,0 +1,8 @@
+opensearch-py
+numpy
+torch
+mteb
+pylate
+google-generativeai
+python-dotenv
+huggingface_hub
