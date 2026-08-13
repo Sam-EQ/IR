@@ -1,13 +1,3 @@
-"""
-Dense (multi-vector) retrieval using GTE-ModernColBERT (lightonai/GTE-ModernColBERT-v1).
-
-Unlike Promptriever, this is a late-interaction model: it produces one
-embedding PER TOKEN and scores with MaxSim, not a single cosine-sim. That's
-architecturally different from a bi-encoder, so it gets its own index
-(pylate's Voyager index) and its own search path.
-
-pip install pylate
-"""
 import os
 import config
 from pylate import indexes, models, retrieve
@@ -28,7 +18,6 @@ def _index_path():
 
 
 def build_index(docs):
-    """docs: list of {"id": ..., "text": ...}."""
     model = get_model()
     os.makedirs(config.INDEX_DIR, exist_ok=True)
 
@@ -39,9 +28,7 @@ def build_index(docs):
     )
     doc_ids = [d["id"] for d in docs]
     doc_texts = [d["text"] for d in docs]
-    doc_embeddings = model.encode(
-        doc_texts, batch_size=16, is_query=False, show_progress_bar=True
-    )
+    doc_embeddings = model.encode(doc_texts, batch_size=16, is_query=False, show_progress_bar=True)
     index.add_documents(documents_ids=doc_ids, documents_embeddings=doc_embeddings)
     print(f"[gte-moderncolbert] indexed {len(doc_ids)} docs -> {_index_path()}")
 
