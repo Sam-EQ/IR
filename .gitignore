@@ -1,0 +1,33 @@
+# --- Secrets — never commit ---
+.env
+.env.*
+!.env.example
+
+# --- Python virtual environment ---
+# named "doc" per `python3.11 -m venv doc` — adjust if you rename it
+doc/
+venv/
+.venv/
+env/
+
+# --- Python bytecode / caches ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Generated dense indexes (regenerable via build_dense_index.py) ---
+# large binary files (embeddings, Voyager ANN index) — don't belong in git,
+# and rebuilding from OpenSearch is the source of truth anyway
+dense_indexes/
+*.npy
+
+# --- OS / editor junk ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
