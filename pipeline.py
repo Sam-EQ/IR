@@ -1,10 +1,3 @@
-"""
-Wires BM25 + one dense retriever + Gemini rerank into a single callable
-pipeline, matching the two flows exactly:
-
-  Flow A: BM25 + Promptriever Llama3 8B  -> union -> Gemini 2.5 Pro -> top-k
-  Flow B: BM25 + GTE-ModernColBERT       -> union -> Gemini 2.5 Pro -> top-k
-"""
 import opensearch_utils
 import dense_promptriever
 import dense_colbert
@@ -27,7 +20,6 @@ def _get_doc_text_map():
 
 
 def _union(bm25_hits, dense_hits):
-    """Dedup by doc id, keeping the higher score if a doc shows up in both."""
     merged = {}
     for h in bm25_hits + dense_hits:
         if h["id"] not in merged or h["score"] > merged[h["id"]]["score"]:
@@ -36,7 +28,6 @@ def _union(bm25_hits, dense_hits):
 
 
 def run_pipeline(query_text, dense_backend, os_client, top_k=None):
-    """dense_backend: "promptriever" or "colbert" """
     backend = DENSE_BACKENDS[dense_backend]
     doc_text_map = _get_doc_text_map()
 

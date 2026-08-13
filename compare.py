@@ -1,12 +1,3 @@
-"""
-Runs the same query through both flows and prints the retrieved content
-side by side, plus which docs each flow uniquely surfaced — the real-time
-comparison Sam/Pradhap wanted.
-
-Usage:
-    python compare.py "who signed the indemnification clause"
-    python compare.py --file queries.txt
-"""
 import argparse
 import opensearch_utils
 import pipeline

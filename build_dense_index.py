@@ -1,15 +1,3 @@
-"""
-One-time step: pulls every doc from OpenSearch and builds:
-  - the shared doc_store (id -> text)
-  - the dense index for the model(s) you choose
-
-Run this on the EC2 L4 box (Promptriever is 8B params).
-
-Usage:
-    python build_dense_index.py --model promptriever
-    python build_dense_index.py --model colbert
-    python build_dense_index.py --model both
-"""
 import argparse
 import opensearch_utils
 import doc_store

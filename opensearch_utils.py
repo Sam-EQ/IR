@@ -1,7 +1,3 @@
-"""
-Everything OpenSearch-related: connecting, BM25 candidate retrieval (shared by
-both flows), and pulling the full corpus once to build the dense indexes.
-"""
 from opensearchpy import OpenSearch
 import config
 
@@ -16,7 +12,6 @@ def get_client():
 
 
 def fetch_all_docs(client, index=None, page_size=500):
-    """Scroll through every doc in the index. Run once, at index-build time."""
     index = index or config.OPENSEARCH_INDEX
     docs = []
     resp = client.search(
@@ -37,7 +32,6 @@ def fetch_all_docs(client, index=None, page_size=500):
 
 
 def bm25_search(client, query_text, top_n=None, index=None):
-    """The BM25 leg that feeds into both flows."""
     index = index or config.OPENSEARCH_INDEX
     top_n = top_n or config.BM25_TOP_N
     resp = client.search(
