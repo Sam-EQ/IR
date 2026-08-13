@@ -1,8 +1,9 @@
 opensearch-py
 numpy
 torch
-mteb
+transformers
+peft
+accelerate
 pylate
-google-generativeai
-python-dotenv
+google-genai
 huggingface_hub
