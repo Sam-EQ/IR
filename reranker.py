@@ -1,17 +1,11 @@
-"""
-Reranks a candidate pool with Gemini 2.5 Pro — the reranker both flows specify.
-Feeds the whole candidate set + query in one prompt and asks for a ranked
-doc-id list back (same long-context rerank approach the LIMIT paper used to
-test Gemini-2.5-Pro as a reranker).
-
-pip install google-generativeai
-"""
 import json
 import re
-import google.generativeai as genai
+import time
+from google import genai
+from google.genai import errors as genai_errors
 import config
 
-genai.configure(api_key=config.GEMINI_API_KEY)
+_client = genai.Client(api_key=config.GEMINI_API_KEY)
 
 _PROMPT = """You are a relevance ranking system.
 
@@ -25,6 +19,9 @@ Documents:
 {docs}
 """
 
+_MAX_RETRIES = 4
+_BASE_DELAY_SECONDS = 5
+
 
 def _format_docs(candidates):
     lines = []
@@ -34,15 +31,29 @@ def _format_docs(candidates):
     return "\n".join(lines)
 
 
+def _generate_with_retry(prompt):
+    last_error = None
+    for attempt in range(_MAX_RETRIES):
+        try:
+            return _client.models.generate_content(
+                model=config.GEMINI_RERANK_MODEL,
+                contents=prompt,
+            )
+        except (genai_errors.ServerError, genai_errors.ClientError) as e:
+            last_error = e
+            delay = _BASE_DELAY_SECONDS * (2 ** attempt)
+            print(f"[reranker] Gemini call failed ({e}), retrying in {delay}s...")
+            time.sleep(delay)
+    raise last_error
+
+
 def rerank(query_text, candidates, top_k=None):
-    """candidates: list of {"id", "text", "score"} — the deduped BM25+dense union."""
     top_k = top_k or config.RERANK_TOP_K
     if not candidates:
         return []
 
-    model = genai.GenerativeModel(config.GEMINI_RERANK_MODEL)
     prompt = _PROMPT.format(query=query_text, docs=_format_docs(candidates))
-    response = model.generate_content(prompt)
+    response = _generate_with_retry(prompt)
 
     raw = (response.text or "").strip()
     match = re.search(r"\[.*\]", raw, re.DOTALL)
@@ -51,7 +62,6 @@ def rerank(query_text, candidates, top_k=None):
     by_id = {c["id"]: c for c in candidates}
     ranked = [by_id[str(i)] for i in ranked_ids if str(i) in by_id]
 
-    # anything Gemini didn't mention stays at the end, in its original order
     seen = {r["id"] for r in ranked}
     for c in candidates:
         if c["id"] not in seen:
