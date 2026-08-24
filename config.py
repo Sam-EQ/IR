@@ -14,6 +14,11 @@ TEXT_FIELD = os.environ.get("OPENSEARCH_TEXT_FIELD", "text")
 GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
 GEMINI_RERANK_MODEL = "gemini-3.6-flash"
 
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY")
+OPENAI_RERANK_MODEL = "gpt-5.6-sol"
+
+RERANKER_BACKEND = os.environ.get("RERANKER_BACKEND", "gemini")
+
 PROMPTRIEVER_MODEL = "samaya-ai/promptriever-llama3.1-8b-v1"
 COLBERT_MODEL = "lightonai/GTE-ModernColBERT-v1"
 

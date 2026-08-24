@@ -6,4 +6,5 @@ peft
 accelerate
 pylate
 google-genai
+openai>=2.45.0
 huggingface_hub
